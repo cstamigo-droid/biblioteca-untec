@@ -64,9 +64,11 @@ public class ConexionBD {
             try (ResultSet rs = st.executeQuery("SELECT COUNT(*) FROM USUARIOS")) {
                 rs.next();
                 if (rs.getInt(1) == 0) {
+                    // Datos de ejemplo. Credenciales de DEMO, documentadas a proposito
+                    // en el README: esta base es un archivo H2 local, no un entorno real.
                     st.executeUpdate("INSERT INTO USUARIOS (nombre, email, clave) VALUES "
-                            + "('Bibliotecaria UNTEC', 'biblioteca@untec.cl', 'untec2026'), "
-                            + "('Cristian Amigo', 'cstamigo@gmail.com', 'admin123')");
+                            + "('Bibliotecaria UNTEC', 'biblioteca@untec.cl', 'demo1234'), "
+                            + "('Administrador', 'admin@untec.cl', 'demo1234')");
                     st.executeUpdate("INSERT INTO LIBROS (titulo, autor) VALUES "
                             + "('Cien años de soledad', 'Gabriel García Márquez'), "
                             + "('El principito', 'Antoine de Saint-Exupéry'), "
