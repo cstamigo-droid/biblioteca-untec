@@ -75,7 +75,12 @@ public class LibroServlet extends HttpServlet {
 
             } else if ("prestar".equals(accion)) {
                 int libroId = Integer.parseInt(request.getParameter("id"));
-                prestamoDAO.prestar(libroId, usuario.getId());
+                // Validacion en el servidor: no basta con ocultar el boton en la vista.
+                boolean prestado = prestamoDAO.prestar(libroId, usuario.getId());
+                if (!prestado) {
+                    response.sendRedirect(request.getContextPath() + "/libros?error=noDisponible");
+                    return;
+                }
                 response.sendRedirect(request.getContextPath() + "/prestamos");
                 return;
             }

@@ -30,3 +30,13 @@ Apache Tomcat 9.0.120 (`http://localhost:8080/biblioteca/`), con Chrome a 1280x7
 
 Requiere Tomcat arriba con /biblioteca desplegado. El script recorre la app con
 Playwright sobre Chrome y vuelve a guardar las 12 imagenes aca.
+
+## 13 — Regla de servidor: un libro prestado no se presta dos veces (29-ago-2026)
+
+`13_regla_libro_ya_prestado.png`
+
+Agregada tras corregir un defecto: la vista ocultaba el boton "Prestar" para un
+libro ya prestado, pero un **POST directo** con `accion=prestar&id=N` creaba un
+segundo prestamo del mismo ejemplar. La comprobacion se movio al servidor
+(`PrestamoDAO.prestar`), y la captura muestra el POST directo rechazado con su
+aviso. Es la evidencia de que la autorizacion no depende de esconder botones.

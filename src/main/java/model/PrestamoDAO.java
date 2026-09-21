@@ -15,8 +15,27 @@ public class PrestamoDAO {
 
     private final LibroDAO libroDAO = new LibroDAO();
 
-    /** CREATE: presta un libro al usuario indicado y lo deja no disponible. */
-    public void prestar(int libroId, int usuarioId) throws SQLException {
+    /**
+     * CREATE: presta un libro al usuario indicado y lo deja no disponible.
+     *
+     * <p>Regla de negocio: solo se presta un libro que esta DISPONIBLE. La
+     * comprobacion vive en el servidor y no en la vista: ocultar el boton
+     * "Prestar" no impide que llegue un POST directo con el id de un libro
+     * ya prestado, lo que crearia un segundo prestamo del mismo ejemplar.</p>
+     *
+     * @return true si el prestamo se registro; false si el libro no estaba
+     *         disponible o no existe.
+     */
+    public boolean prestar(int libroId, int usuarioId) throws SQLException {
+        String verificar = "SELECT disponible FROM LIBROS WHERE id = ?";
+        try (PreparedStatement ps = ConexionBD.getConexion().prepareStatement(verificar)) {
+            ps.setInt(1, libroId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (!rs.next() || !rs.getBoolean(1)) {
+                    return false;   // no existe o ya esta prestado
+                }
+            }
+        }
         String sql = "INSERT INTO PRESTAMOS (libro_id, usuario_id, fecha_prestamo) "
                 + "VALUES (?, ?, CURRENT_DATE)";
         try (PreparedStatement ps = ConexionBD.getConexion().prepareStatement(sql)) {
@@ -25,10 +44,16 @@ public class PrestamoDAO {
             ps.executeUpdate();
         }
         libroDAO.cambiarDisponibilidad(libroId, false);
+        return true;
     }
 
-    /** UPDATE: registra la devolución y libera el libro. */
-    public void devolver(int prestamoId) throws SQLException {
+    /**
+     * UPDATE: registra la devolucion y libera el libro.
+     * Regla: un mismo prestamo solo puede devolverse una vez.
+     * @return true si se registro la devolucion; false si el prestamo no
+     *         existe o ya habia sido devuelto.
+     */
+    public boolean devolver(int prestamoId) throws SQLException {
         int libroId = -1;
         String buscar = "SELECT libro_id FROM PRESTAMOS WHERE id = ? AND devuelto = FALSE";
         try (PreparedStatement ps = ConexionBD.getConexion().prepareStatement(buscar)) {
@@ -37,7 +62,7 @@ public class PrestamoDAO {
                 if (rs.next()) libroId = rs.getInt(1);
             }
         }
-        if (libroId == -1) return;   // no existe o ya estaba devuelto
+        if (libroId == -1) return false;   // no existe o ya estaba devuelto
 
         String marcar = "UPDATE PRESTAMOS SET devuelto = TRUE WHERE id = ?";
         try (PreparedStatement ps = ConexionBD.getConexion().prepareStatement(marcar)) {
@@ -45,6 +70,7 @@ public class PrestamoDAO {
             ps.executeUpdate();
         }
         libroDAO.cambiarDisponibilidad(libroId, true);
+        return true;
     }
 
     /** READ: historial de préstamos con título y usuario (JOIN de 3 tablas). */

@@ -43,7 +43,7 @@ La base de datos H2 se crea sola en el primer arranque, con datos de ejemplo.
 | Usuario | Correo | Contraseña |
 |---|---|---|
 | Bibliotecaria UNTEC | `biblioteca@untec.cl` | `untec2026` |
-| Cristian Amigo | `cstamigo@gmail.com` | `admin123` |
+| Administrador UNTEC | `admin@untec.cl` | `admin123` |
 
 ---
 

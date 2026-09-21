@@ -46,6 +46,9 @@
 <c:if test="${param.error == 'historial'}">
     <div class="aviso">Ese libro no se puede eliminar: tiene historial de préstamos.</div>
 </c:if>
+<c:if test="${param.error == 'noDisponible'}">
+    <div class="aviso">Ese libro ya está prestado: no se puede prestar dos veces.</div>
+</c:if>
 
 <table>
     <tr><th>ID</th><th>Título</th><th>Autor</th><th>Estado</th><th>Acciones</th></tr>
